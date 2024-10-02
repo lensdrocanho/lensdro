@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Brinquedos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f7f7f7;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+        }
+        .form-control {
+            margin-bottom: 10px;
+        }
+        .form-control label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-control input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        .button {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Loja de Brinquedos</h1>
+    <div class="container">
+        <div id="adicionarBrinquedo">
+            <h2>Adicionar Brinquedo</h2>
+            <div class="form-control">
+                <label for="nome">Nome do Brinquedo:</label>
+                <input type="text" id="nome">
+            </div>
+            <div class="form-control">
+                <label for="preco">Preço:</label>
+                <input type="number" id="preco" step="0.01">
+            </div>
+            <div class="form-control">
+                <label for="quantidade">Quantidade em Estoque:</label>
+                <input type="number" id="quantidade">
+            </div>
+            <button class="button" onclick="adicionarBrinquedo()">Adicionar Brinquedo</button>
+        </div>
+
+        <div id="listarBrinquedos">
+            <h2>Estoque de Brinquedos</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nome</th>
+                        <th>Preço</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelaBrinquedos">
+                    <!-- Lista de Brinquedos -->
+                </tbody>
+            </table>
+        </div>
+
+        <div id="buscarBrinquedo">
+            <h2>Buscar Brinquedo</h2>
+            <div class="form-control">
+                <label for="buscarNome">Nome do Brinquedo:</label>
+                <input type="text" id="buscarNome">
+            </div>
+            <button class="button" onclick="buscarBrinquedo()">Buscar</button>
+            <p id="resultadoBusca"></p>
+        </div>
+
+        <div id="registrarVenda">
+            <h2>Registrar Venda</h2>
+            <div class="form-control">
+                <label for="vendaId">ID do Brinquedo:</label>
+                <input type="number" id="vendaId">
+            </div>
+            <div class="form-control">
+                <label for="vendaQuantidade">Quantidade:</label>
+                <input type="number" id="vendaQuantidade">
+            </div>
+            <button class="button" onclick="registrarVenda()">Registrar Venda</button>
+        </div>
+
+        <div id="relatorioVendas">
+            <h2>Relatório de Vendas</h2>
+            <ul id="listaVendas">
+                <!-- Relatório de vendas -->
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let brinquedos = [];
+        let vendas = [];
+        let idCounter = 1;
+
+        function adicionarBrinquedo() {
+            const nome = document.getElementById('nome').value;
+            const preco = parseFloat(document.getElementById('preco').value);
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+
+            if (nome && preco > 0 && quantidade >= 0) {
+                const brinquedo = {
+                    id: idCounter++,
+                    nome: nome,
+                    preco: preco,
+                    quantidade: quantidade
+                };
+                brinquedos.push(brinquedo);
+                atualizarTabela();
+                limparFormulario();
+                alert('Brinquedo adicionado com sucesso!');
+            } else {
+                alert('Preencha todos os campos corretamente.');
+            }
+        }
+
+        function atualizarTabela() {
+            const tabelaBrinquedos = document.getElementById('tabelaBrinquedos');
+            tabelaBrinquedos.innerHTML = '';
+            brinquedos.forEach(brinquedo => {
+                tabelaBrinquedos.innerHTML += `
+                    <tr>
+                        <td>${brinquedo.id}</td>
+                        <td>${brinquedo.nome}</td>
+                        <td>R$ ${brinquedo.preco.toFixed(2)}</td>
+                        <td>${brinquedo.quantidade}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function limparFormulario() {
+            document.getElementById('nome').value = '';
+            document.getElementById('preco').value = '';
+            document.getElementById('quantidade').value = '';
+        }
+
+        function buscarBrinquedo() {
+            const nome = document.getElementById('buscarNome').value.toLowerCase();
+            const resultadoBusca = document.getElementById('resultadoBusca');
+            const brinquedo = brinquedos.find(b => b.nome.toLowerCase() === nome);
+
+            if (brinquedo) {
+                resultadoBusca.innerText = `Brinquedo encontrado: ID: ${brinquedo.id}, Nome: ${brinquedo.nome}, Preço: R$${brinquedo.preco.toFixed(2)}, Estoque: ${brinquedo.quantidade}`;
+            } else {
+                resultadoBusca.innerText = 'Brinquedo não encontrado.';
+            }
+        }
+
+        function registrarVenda() {
+            const id = parseInt(document.getElementById('vendaId').value);
+            const quantidade = parseInt(document.getElementById('vendaQuantidade').value);
+            const brinquedo = brinquedos.find(b => b.id === id);
+
+            if (brinquedo && quantidade > 0 && brinquedo.quantidade >= quantidade) {
+                brinquedo.quantidade -= quantidade;
+                const valorTotal = brinquedo.preco * quantidade;
+                vendas.push({ id: brinquedo.id, quantidade: quantidade, valorTotal: valorTotal });
+                atualizarTabela();
+                atualizarRelatorioVendas();
+                alert(`Venda realizada! Valor total: R$${valorTotal.toFixed(2)}`);
+            } else {
+                alert('Estoque insuficiente ou brinquedo não encontrado.');
+            }
+        }
+
+        function atualizarRelatorioVendas() {
+            const listaVendas = document.getElementById('listaVendas');
+            listaVendas.innerHTML = '';
+            vendas.forEach(venda => {
+                listaVendas.innerHTML += `<li>ID: ${venda.id}, Quantidade: ${venda.quantidade}, Valor Total: R$${venda.valorTotal.toFixed(2)}</li>`;
+            });
+        }
+    </script>
+
+</body>
+</html>
